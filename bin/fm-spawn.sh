@@ -39,10 +39,12 @@
 #   prefix is the captain's standing preference and the brief agreement above
 #   already guarantees the worker's instructions match the branch.
 #   --base-branch is the optional branch selected at intake for a ship or scout
-#   to start from and target instead of origin's default branch. A fresh launch
-#   resets its pooled copy to origin/<branch>, refusing when the project has no
-#   origin or origin lacks that branch, or when the project's registered forge
-#   cannot carry it. It must agree with every Setup "Base branch:" line in the
+#   to start from and land on instead of origin's default branch (a pull request
+#   targets it; a local-only ship has bin/fm-merge-local.sh fast-forward it). A
+#   fresh launch resets its pooled copy to origin/<branch> and leaves the copy's
+#   origin/HEAD record untouched, refusing when the project has no origin or
+#   origin lacks that branch, or when the project's registered forge cannot
+#   carry it. It must agree with every Setup "Base branch:" line in the
 #   brief (bin/fm-brief.sh --base-branch writes one; other such lines are prose),
 #   and a brief with such a line refuses a spawn without the flag. The spawn records it as
 #   base_branch= in state/<id>.meta, which a relaunch reuses and later review and
