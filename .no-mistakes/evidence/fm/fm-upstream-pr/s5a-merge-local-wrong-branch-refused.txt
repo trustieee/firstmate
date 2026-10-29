@@ -1,0 +1,16 @@
+# state before any landing attempt
+  main=67ba0d7 dev=4e9f017 checkout=dev origin/HEAD=origin/main status=''
+
+$ # BEFORE this change: base-tree fm-merge-local.sh on the same based task (checkout on dev)
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: $LAB/projects/notes is on 'dev', expected default branch 'main'; cannot merge safely
+exit=1
+  main=67ba0d7 dev=4e9f017 checkout=dev origin/HEAD=origin/main status=''
+
+$ # AFTER, adversarial: project checkout on main (the default branch) while the task recorded base dev
+  main=67ba0d7 dev=4e9f017 checkout=main origin/HEAD=origin/main status=''
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-dev-r1
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: $LAB/projects/notes is on 'main', but task lo-dev-r1 lands on its recorded base branch 'dev'; check out dev in $LAB/projects/notes before retrying, because the base named at intake is the landing branch and is not re-pointed here
+exit=1
+  main=67ba0d7 dev=4e9f017 checkout=main origin/HEAD=origin/main status=''

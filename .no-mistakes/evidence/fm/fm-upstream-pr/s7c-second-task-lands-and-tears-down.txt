@@ -1,0 +1,11 @@
+done accepted: exit=0 local_done_head=1981a8bc
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-dev-r2
+merged fm/lo-dev-r2 into local dev (985ad0bde24f5dcb17032a18824024ad9e9e0c36 -> 1981a8b) in $LAB/projects/notes
+exit=0
+  dev=1981a8b main=67ba0d7 origin/HEAD=origin/main status=''
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-dev-r2
+teardown: reaping leaked worktree process(es) for lo-dev-r2: 188245 189101
+teardown: force-killing leaked worktree process(es) for lo-dev-r2: 188245
+teardown lo-dev-r2 complete (window <fm-lab session>:w2:p2, worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes)
+exit=0
+(removed lab tag dev)

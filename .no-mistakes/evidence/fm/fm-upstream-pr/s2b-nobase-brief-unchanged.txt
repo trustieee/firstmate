@@ -1,0 +1,2 @@
+$ # No-base local-only brief: base-tree output vs target output, with home and bin paths normalized
+IDENTICAL: a local-only brief with no base renders byte-for-byte the same contract as before this change

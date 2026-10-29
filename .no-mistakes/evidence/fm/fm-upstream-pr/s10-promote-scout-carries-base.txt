@@ -1,0 +1,44 @@
+$ FM_HOME=$LAB bin/fm-spawn.sh sc-dev-r1 $P "sh -c ..." --scout --base-branch dev --backend herdr
+spawned sc-dev-r1 harness=sh kind=scout window=<fm-lab session>:w5:p2 worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+scout meta: kind=scout base_branch=dev 
+
+$ # BEFORE this change (7bbf71b4): fm-promote.sh sc-dev-r1 --mode local-only --yolo off   (run on a copy of the record)
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: fm-promote.sh sc-dev-r1: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base
+exit=1
+
+$ # AFTER: FM_HOME=$LAB bin/fm-promote.sh sc-dev-r1 --mode local-only --yolo off
+promoted sc-dev-r1 to ship mode=local-only yolo=off (teardown protection restored)
+wrote ship instructions for mode=local-only: $LAB/data/sc-dev-r1/ship-instructions.md
+next: FM_HOME=$LAB bin/fm-send.sh fm-sc-dev-r1 "$(cat $LAB/data/sc-dev-r1/ship-instructions.md)"
+exit=0
+promoted meta: base_branch=dev kind=ship mode=local-only yolo=off branch=fm/sc-dev-r1 
+$ grep -n "base branch\|dev\`" $LAB/data/sc-dev-r1/ship-instructions.md
+11:3. Return to a clean copy of the base branch `dev`, then create your branch: `git checkout -b fm/sc-dev-r1 --`.
+30:1. Never push to any remote and never open a PR. Work only on your `fm/sc-dev-r1` branch; firstmate handles the fast-forward of the local base branch `dev`.
+38:This task's base branch is `dev`, not the repository default: keep your branch a clean fast-forward onto it - if `dev` has advanced, rebase onto it so the eventual landing stays a fast-forward - and never rebase onto the default branch.
+40:The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.
+# promoted worker follows its ship instructions: branch from local dev, commit, report ready
+done accepted: exit=0
+$ FM_HOME=$LAB bin/fm-merge-local.sh sc-dev-r1   (checkout on dev)
+merged fm/sc-dev-r1 into local dev (1981a8bc7447f36befa9060ae1367b1fbba75914 -> 9ebea43) in $LAB/projects/notes
+exit=0
+  dev=9ebea43 main=165cb97 status=''
+$ FM_HOME=$LAB bin/fm-teardown.sh sc-dev-r1
+teardown: reaping leaked worktree process(es) for sc-dev-r1: 210599 211568
+teardown: force-killing leaked worktree process(es) for sc-dev-r1: 210599
+teardown sc-dev-r1 complete (window <fm-lab session>:w5:p2, worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes)
+exit=0
+
+# final project history
+  9ebea43 (HEAD -> dev, fm/sc-dev-r1) docs: add NOTICE
+  165cb97 (main, fm/lo-nobase-r1) docs: license note
+  1de7035 (rel, fm/lo-rel-r1) docs: release note
+  e5544ea (origin/rel) rel: release prep
+  1981a8b (fm/lo-dev-r2) docs: add contributing note
+  985ad0b (fm/lo-dev-r1) docs: add changelog entry
+  67ba0d7 (origin/main, origin/HEAD) initial on main
+  4e9f017 (origin/dev) dev: integration work
+origin/HEAD at end: origin/main
+origin (bare) branches never pushed to: dev=4e9f017 main=67ba0d7 rel=e5544ea 

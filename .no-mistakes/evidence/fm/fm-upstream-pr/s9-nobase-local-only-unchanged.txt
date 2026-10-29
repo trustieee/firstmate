@@ -1,0 +1,19 @@
+$ FM_HOME=$LAB bin/fm-spawn.sh lo-nobase-r1 $P "sh -c ..." --mode local-only --yolo off --backend herdr   # no --base-branch
+spawned lo-nobase-r1 harness=sh kind=ship mode=local-only yolo=off window=<fm-lab session>:w4:p2 worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+base_branch lines in meta: 0
+copy HEAD=67ba0d7 origin/main=67ba0d7
+done accepted: exit=0
+# project checkout is on rel
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-nobase-r1
+error: $LAB/projects/notes is on 'rel', expected default branch 'main'; cannot merge safely
+exit=1
+# project checkout switched to main
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-nobase-r1
+merged fm/lo-nobase-r1 into local main (67ba0d732dc5d17769a8189009ea205f13df3a6e -> 165cb97) in $LAB/projects/notes
+exit=0
+  main=165cb97 dev=1981a8b rel=1de7035 status=''
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-nobase-r1
+teardown: reaping leaked worktree process(es) for lo-nobase-r1: 204670 205522
+teardown: force-killing leaked worktree process(es) for lo-nobase-r1: 204670
+teardown lo-nobase-r1 complete (window <fm-lab session>:w4:p2, worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes)
+exit=0

@@ -1,0 +1,13 @@
+# worker side (standing in for the crewmate agent): commit on the ship branch, report ready
+ship head: 985ad0bde24f5dcb17032a18824024ad9e9e0c36
+
+$ FM_HOME=$LAB bin/fm-crew-state.sh lo-dev-r1
+state: unknown · source: pane · harness state unavailable (unknown missing)
+exit=0
+$ grep local_done_head $LAB/state/lo-dev-r1.meta
+$ # crew-state on a raw sh pane cannot classify the harness, so the done gate is driven through its own owner:
+$ FM_HOME=$LAB bash -c ". bin/fm-dod-lib.sh; fm_dod_accept_ship_done ship local-only \$WT \$P \"\$(tail -1 \$LAB/state/lo-dev-r1.status)\" \$LAB/state lo-dev-r1 \$LAB/state/lo-dev-r1.meta"
+exit=0
+$ grep local_done_head $LAB/state/lo-dev-r1.meta
+local_done_head=985ad0bde24f5dcb17032a18824024ad9e9e0c36
+ship branch fm/lo-dev-r1 in project: 985ad0bde24f5dcb17032a18824024ad9e9e0c36

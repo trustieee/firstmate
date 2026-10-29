@@ -1,0 +1,7 @@
+$ git -C $P symbolic-ref --short refs/remotes/origin/HEAD   # before spawn
+origin/main
+$ HERDR_SESSION=<fm-lab session> FM_HOME=$LAB bin/fm-spawn.sh lo-dev-r1 $P "sh -c 'echo lab-worker-ready; exec sleep 3600'" --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+warning: herdr presentation parent is absent or ambiguous; using the ordinary flat layout without projection
+spawned lo-dev-r1 harness=sh kind=ship mode=local-only yolo=off window=<fm-lab session>:w1:p2 worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+exit=0

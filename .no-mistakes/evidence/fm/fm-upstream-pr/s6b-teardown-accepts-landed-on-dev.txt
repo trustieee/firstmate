@@ -1,0 +1,15 @@
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-dev-r1   # after landing on local dev (tag dev still present at an older commit)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lo-dev-r1: 174598 175559
+teardown: force-killing leaked worktree process(es) for lo-dev-r1: 174598
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lo-dev-r1 complete (window <fm-lab session>:w1:p2, worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes)
+Backlog: lo-dev-r1 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lo-dev-r1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+meta removed: yes
+worker pane closed: yes
+project: dev=985ad0b main=67ba0d7 checkout=dev status=''

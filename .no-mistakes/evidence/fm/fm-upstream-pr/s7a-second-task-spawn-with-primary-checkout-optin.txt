@@ -1,0 +1,8 @@
+# config/spawn-base-primary-checkout is ON; local dev (985ad0b) is ahead of origin/dev (4e9f017) after the first local landing
+$ FM_HOME=$LAB bin/fm-spawn.sh lo-dev-r2 $P "sh -c '...'" --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+warning: herdr presentation parent is absent or ambiguous; using the ordinary flat layout without projection
+spawned lo-dev-r2 harness=sh kind=ship mode=local-only yolo=off window=<fm-lab session>:w2:p2 worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+exit=0
+copy HEAD=4e9f017 origin/dev=4e9f017 local dev=985ad0b
+base_branch recorded: base_branch=dev

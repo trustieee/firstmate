@@ -1,0 +1,26 @@
+# origin carries rel; the project has NO local rel branch: fatal: 'refs/heads/rel' - not a valid ref
+$ FM_HOME=$LAB bin/fm-spawn.sh lo-rel-r1 $P "sh -c ..." --mode local-only --yolo off --base-branch rel --backend herdr
+spawned lo-rel-r1 harness=sh kind=ship mode=local-only yolo=off window=<fm-lab session>:w3:p2 worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+copy HEAD=e5544ea origin/rel=e5544ea
+done accepted: exit=0
+  before: dev=1981a8b main=67ba0d7 checkout=dev
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-rel-r1
+error: task lo-rel-r1 lands on its recorded base branch 'rel', but $LAB/projects/notes has no local branch of that name; create or check it out there, then retry
+exit=1
+  after:  dev=1981a8b main=67ba0d7 checkout=dev local rel exists: no status=''
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-rel-r1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+REFUSED: task lo-rel-r1 recorded base branch 'rel', but $LAB/projects/notes has no local branch of that name to judge its work landed against.
+Restore that branch, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta still present: yes
+$ git -C $P switch -c rel --track origin/rel   # the remedy the refusal names
+$ FM_HOME=$LAB bin/fm-merge-local.sh lo-rel-r1
+merged fm/lo-rel-r1 into local rel (e5544ea9c4a52033f3e9aa029d178225e92ea19d -> 1de7035) in $LAB/projects/notes
+exit=0
+  rel=1de7035 dev=1981a8b main=67ba0d7 status=''
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-rel-r1
+teardown: reaping leaked worktree process(es) for lo-rel-r1: 196613 197458
+teardown: force-killing leaked worktree process(es) for lo-rel-r1: 196613
+teardown lo-rel-r1 complete (window <fm-lab session>:w3:p2, worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes)
+exit=0

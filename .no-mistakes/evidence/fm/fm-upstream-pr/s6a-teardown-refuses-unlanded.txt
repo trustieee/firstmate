@@ -1,0 +1,16 @@
+$ FM_HOME=$LAB bin/fm-teardown.sh lo-dev-r1   # before landing: work only on fm/lo-dev-r1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: local-only worktree $W/treehouse/.treehouse/notes-6f6dac/1/notes has work not yet merged into dev and not on any remote.
+commits not yet on dev:
+985ad0b docs: add changelog entry
+Merge the branch into local dev first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta still present: yes
+worktree still present: yes

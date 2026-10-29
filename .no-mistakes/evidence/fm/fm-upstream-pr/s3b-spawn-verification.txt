@@ -1,0 +1,31 @@
+$ cat $LAB/state/lo-dev-r1.meta   # selected keys
+worktree=$W/treehouse/.treehouse/notes-6f6dac/1/notes
+project=$LAB/projects/notes
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/lo-dev-r1
+base_branch=dev
+backend=herdr
+
+$ git -C $WT rev-parse HEAD; git -C $P rev-parse origin/dev origin/main
+copy HEAD:   4e9f0175bca51a7bd1fc12fab062035e387271ba
+origin/dev:  4e9f0175bca51a7bd1fc12fab062035e387271ba
+origin/main: 67ba0d732dc5d17769a8189009ea205f13df3a6e
+copy branch: (detached)
+copy has dev.txt (dev-only file): yes
+
+$ git -C $P symbolic-ref --short refs/remotes/origin/HEAD   # after spawn
+origin/main
+$ git -C $P branch --show-current   # project checkout untouched
+dev
+
+$ herdr pane read <pane> (lab session) - the worker pane
+house/.treehouse/notes-6f6dac/1/notes'
+user@host:$W/treehouse/.treehouse/notes-6f6dac/1/notes$ export GOTMPDIR=/tmp/fm-lo-dev-r1/go
+tmp
+user@host:$W/treehouse/.treehouse/notes-6f6dac/1/notes$ export COMPACT_ADVISER_DISABLE=1
+user@host:$W/treehouse/.treehouse/notes-6f6dac/1/notes$ export FM_TASK_ID=lo-dev-r1
+user@host:$W/treehouse/.treehouse/notes-6f6dac/1/notes$ . '/tmp/fm-lo-dev-r1+2ba5104b365c18f
+30d4185af368b502b08867eee57fad692894b1d8f40a019e8/launch.s1793285369.173644.7062.sh'
+lab-worker-ready

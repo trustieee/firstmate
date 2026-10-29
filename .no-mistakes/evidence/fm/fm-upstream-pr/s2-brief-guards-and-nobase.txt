@@ -1,0 +1,27 @@
+$ # Adversarial: invalid base names are still refused for local-only
+$ bin/fm-brief.sh lo-bad-r1 notes --mode local-only --base-branch '-dev'
+error: fm-brief.sh --base-branch: base branch '-dev' is not a valid git branch name
+exit=1
+$ bin/fm-brief.sh lo-bad-r1 notes --mode local-only --base-branch 'dev..x'
+error: fm-brief.sh --base-branch: base branch 'dev..x' is not a valid git branch name
+exit=1
+$ bin/fm-brief.sh lo-bad-r1 notes --mode local-only --base-branch 'dev lock'
+error: fm-brief.sh --base-branch: base branch 'dev lock' is not a valid git branch name
+exit=1
+
+$ # Adversarial: a base branch is still refused on a forge (no-mistakes + forge=gerrit)
+$ bin/fm-brief.sh nm-gerrit-r1 notes --mode no-mistakes --forge gerrit --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=gerrit
+exit=1
+$ bin/fm-brief.sh dpr-forgejo-r1 notes --mode direct-PR --forge forgejo --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=forgejo
+exit=1
+
+$ # Regression: a local-only brief with no base still names local main
+$ bin/fm-brief.sh lo-nobase-r1 notes --mode local-only
+scaffolded: $LAB/data/lo-nobase-r1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+25:1. Never push to any remote and never open a PR. Work only on your `fm/lo-nobase-r1` branch; firstmate handles the merge into local `main`.
+100:Keep your branch a clean fast-forward onto the current default branch - if `main` has advanced, rebase onto it so the eventual merge stays a fast-forward.
+102:The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the guarded fast-forward path.
+(see s2b-nobase-brief-unchanged.txt for the normalized before/after comparison)

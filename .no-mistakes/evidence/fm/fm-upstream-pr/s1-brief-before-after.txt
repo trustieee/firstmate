@@ -1,0 +1,9 @@
+$ # BEFORE this change (base 7bbf71b4): local-only + --base-branch dev
+$ FM_HOME=$W/before-home <base>/bin/fm-brief.sh lo-dev-x1 notes --mode local-only --base-branch dev --project $LAB/projects/notes
+error: fm-brief.sh --base-branch: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base
+exit=1
+
+$ # AFTER this change (target b8fa0861): same command
+$ FM_HOME=$LAB bin/fm-brief.sh lo-dev-r1 notes --mode local-only --base-branch dev --project $LAB/projects/notes
+scaffolded: $LAB/data/lo-dev-r1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0

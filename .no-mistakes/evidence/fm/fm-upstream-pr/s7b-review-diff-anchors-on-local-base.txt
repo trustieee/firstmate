@@ -1,0 +1,39 @@
+# worker rebased fm/lo-dev-r2 onto local dev per its Definition of done; a tag named dev still points at main
+  1981a8b (fm/lo-dev-r2) docs: add contributing note
+  985ad0b (HEAD -> dev, fm/lo-dev-r1) docs: add changelog entry
+  67ba0d7 (tag: dev, origin/main, origin/HEAD, main) initial on main
+  4e9f017 (origin/dev) dev: integration work
+
+$ # TARGET, opt-in ON: FM_HOME=$LAB bin/fm-review-diff.sh lo-dev-r2 --stat
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: dev
+ CONTRIBUTING.md | 1 +
+ 1 file changed, 1 insertion(+)
+exit=0
+
+$ # PRE-REVIEW-FIX (061f50ba), opt-in ON: same command
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: dev
+warning: refname 'dev' is ambiguous.
+warning: refname 'dev' is ambiguous.
+ CHANGELOG.md    | 2 ++
+ CONTRIBUTING.md | 1 +
+ dev.txt         | 1 +
+ 3 files changed, 4 insertions(+)
+exit=0
+
+$ # BEFORE this change (7bbf71b4), opt-in ON: same command
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: origin/dev
+ CHANGELOG.md    | 2 ++
+ CONTRIBUTING.md | 1 +
+ 2 files changed, 3 insertions(+)
+exit=0
+
+$ # TARGET, opt-in OFF: FM_HOME=$LAB bin/fm-review-diff.sh lo-dev-r2 --stat
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: origin/dev
+ CHANGELOG.md    | 2 ++
+ CONTRIBUTING.md | 1 +
+ 2 files changed, 3 insertions(+)
+exit=0

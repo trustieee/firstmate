@@ -1,0 +1,19 @@
+# checkout back on dev, plus a same-named tag dev at an older ancestor commit
+  main=67ba0d7 dev=4e9f017 tag-dev=67ba0d7 checkout=dev origin/HEAD=origin/main status=''
+
+$ # PRE-REVIEW-FIX (061f50ba) fm-merge-local.sh lo-dev-r1
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: $LAB/projects/notes is on 'heads/dev', but task lo-dev-r1 lands on its recorded base branch 'dev'; check out dev in $LAB/projects/notes before retrying, because the base named at intake is the landing branch and is not re-pointed here
+exit=1
+  main=67ba0d7 dev=4e9f017 tag-dev=67ba0d7 checkout=dev origin/HEAD=origin/main status=''
+# (lab repair after the pre-fix run: git reset --hard on dev)
+  main=67ba0d7 dev=4e9f017 tag-dev=67ba0d7 checkout=dev origin/HEAD=origin/main status=''
+
+$ # TARGET (b8fa0861) FM_HOME=$LAB bin/fm-merge-local.sh lo-dev-r1
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lo-dev-r1 into local dev (4e9f0175bca51a7bd1fc12fab062035e387271ba -> 985ad0b) in $LAB/projects/notes
+exit=0
+  main=67ba0d7 dev=985ad0b tag-dev=67ba0d7 checkout=dev origin/HEAD=origin/main status=''
+ship head (local_done_head): 985ad0b
+CHANGELOG.md in project checkout: ## dev|- lab change from lo-dev-r1|
+dev.txt still present: yes
