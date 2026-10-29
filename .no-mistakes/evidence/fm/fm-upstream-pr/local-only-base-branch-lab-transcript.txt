@@ -1,0 +1,603 @@
+
+===== Setup: scratch project whose remote default is main while local work lives on dev =====
+$ git -C $LAB/projects/demo log --oneline --all --decorate
+87effe2 (HEAD -> dev, origin/dev) dev: integration work
+63a201c (origin/main, origin/HEAD, main) init on main
+[exit 0]
+$ git -C $LAB/projects/demo symbolic-ref --short refs/remotes/origin/HEAD
+origin/main
+[exit 0]
+$ git -C $LAB/projects/demo branch --show-current
+dev
+[exit 0]
+$ cat $LAB/data/projects.md
+- demo [local-only] - scratch local-only project, working branch dev (added 2026-10-29)
+[exit 0]
+
+===== S1: fm-brief scaffolds a local-only ship on base dev (upstream refused this) =====
+$ fm fm-brief.sh lbt1 demo --mode local-only --base-branch dev
+scaffolded: $LAB/data/lbt1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ grep -n -i -E base branch|local base|local `main`|fast-forward|Delivery contract|Ship branch $LAB/data/lbt1/brief.md
+16:You are in a disposable git worktree of demo, at a detached HEAD on a clean copy of its base branch.
+17:Base branch: dev
+26:1. Never push to any remote and never open a PR. Work only on your `fm/lbt1` branch; firstmate handles the fast-forward of the local base branch `dev`.
+96:Delivery contract: mode=local-only
+97:Ship branch: fm/lbt1
+101:This task's base branch is `dev`, not the repository default: keep your branch a clean fast-forward onto it - if `dev` has advanced, rebase onto it so the eventual landing stays a fast-forward - and never rebase onto the default branch.
+103:The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.
+[exit 0]
+
+===== S2: fm-spawn starts a local-only ship from origin/dev, records base_branch=dev, leaves origin/HEAD alone =====
+$ fm fm-spawn.sh lbt1 $LAB/projects/demo sh -c 'echo lab-worker-lbt1-ready; exec sleep 7200' --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbt1 harness=sh kind=ship mode=local-only yolo=off window=$SESSION:w1:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ grep -E ^(kind|mode|branch|base_branch|project|worktree|backend|yolo)= $LAB/state/lbt1.meta
+worktree=~/.treehouse/demo-986d03/1/demo
+project=$LAB/projects/demo
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/lbt1
+base_branch=dev
+backend=herdr
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo rev-parse HEAD
+87effe222dc8301463ee7e2259e69f205597a368
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse origin/dev origin/main
+87effe222dc8301463ee7e2259e69f205597a368
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ git -C $LAB/projects/demo symbolic-ref --short refs/remotes/origin/HEAD
+origin/main
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo status --short --branch
+## HEAD (no branch)
+[exit 0]
+
+===== S3: worker commits on fm/lbt1 in its copy and reports done; firstmate's crew-state check accepts and latches the head =====
+$ git -C ~/.treehouse/demo-986d03/1/demo checkout -b fm/lbt1
+Switched to a new branch 'fm/lbt1'
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo add FEATURE.md
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo commit -qm add FEATURE.md
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo log --oneline -3
+989abe6 add FEATURE.md
+87effe2 dev: integration work
+63a201c init on main
+[exit 0]
+$ cat $LAB/state/lbt1.status
+done [at=1793282737]: ready in branch fm/lbt1
+[exit 0]
+$ fm fm-crew-state.sh lbt1
+state: unknown · source: pane · harness state unavailable (unknown missing)
+[exit 0]
+$ grep ^local_done_head= $LAB/state/lbt1.meta
+[exit 1]
+(pane runs a plain shell, so fm-crew-state reports unknown; latching via the same fm_dod_accept_ship_done call crew-state makes)
+$ accept_done lbt1
+[exit 0]
+$ grep ^local_done_head= $LAB/state/lbt1.meta
+local_done_head=989abe60b2ed620141d805916fda520eba4b1b35
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse fm/lbt1
+989abe60b2ed620141d805916fda520eba4b1b35
+[exit 0]
+
+===== S4: fm-merge-local refuses by name while the project checkout is on main (the default branch) =====
+$ git -C $LAB/projects/demo branch --show-current
+main
+[exit 0]
+$ fm fm-merge-local.sh lbt1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: $LAB/projects/demo is on 'main', but task lbt1 lands on its recorded base branch 'dev'; check out dev in $LAB/projects/demo before retrying, because the base named at intake is the landing branch and is not re-pointed here
+[exit 1]
+$ git -C $LAB/projects/demo rev-parse refs/heads/main refs/heads/dev
+63a201ceaf43009a1bb13619864103360ffc8617
+87effe222dc8301463ee7e2259e69f205597a368
+[exit 0]
+$ git -C $LAB/projects/demo status --porcelain
+[exit 0]
+
+===== S5: with the checkout on dev (and an adversarial tag also named dev at main's commit), fm-merge-local fast-forwards local dev to the accepted head; main stays put =====
+$ git -C $LAB/projects/demo show-ref dev
+87effe222dc8301463ee7e2259e69f205597a368 refs/heads/dev
+87effe222dc8301463ee7e2259e69f205597a368 refs/remotes/origin/dev
+63a201ceaf43009a1bb13619864103360ffc8617 refs/tags/dev
+[exit 0]
+$ fm fm-merge-local.sh lbt1
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lbt1 into local dev (87effe222dc8301463ee7e2259e69f205597a368 -> 989abe6) in $LAB/projects/demo
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse refs/heads/dev refs/heads/main refs/tags/dev
+989abe60b2ed620141d805916fda520eba4b1b35
+63a201ceaf43009a1bb13619864103360ffc8617
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ git -C $LAB/projects/demo status --porcelain
+[exit 0]
+$ cat $LAB/projects/demo/FEATURE.md $LAB/projects/demo/DEV.md
+feature on the dev line
+dev integration work
+[exit 0]
+$ git -C $LAB/projects/demo symbolic-ref --short refs/remotes/origin/HEAD
+origin/main
+[exit 0]
+
+===== S6: fm-teardown judges lbt1 landed against local dev (origin/dev and main never received it) and tears the task down =====
+$ git -C $LAB/projects/demo branch -r --contains fm/lbt1
+[exit 0]
+$ git -C $LAB/projects/demo branch --contains fm/lbt1
+* dev
++ fm/lbt1
+[exit 0]
+$ fm fm-teardown.sh lbt1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbt1: 3595889 3596752
+teardown: force-killing leaked worktree process(es) for lbt1: 3595889
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbt1 complete (window $SESSION:w1:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbt1 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbt1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ ls $LAB/state/
+home-summary.json
+terminal-outcomes
+[exit 0]
+$ bin/fm-herdr-lab.sh run fm-lab-localbase-3592949-1693 pane get w1:p2
+{"error":{"code":"pane_not_found","message":"pane w1:p2 not found"},"id":"cli:pane:get"}
+[exit 1]
+
+===== S7 setup: second based task lbt2 (local dev now ahead of origin/dev by lbt1's landing) =====
+$ fm fm-brief.sh lbt2 demo --mode local-only --base-branch dev
+scaffolded: $LAB/data/lbt2/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ fm fm-spawn.sh lbt2 $LAB/projects/demo sh -c 'echo lab-worker-lbt2-ready; exec sleep 7200' --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbt2 harness=sh kind=ship mode=local-only yolo=off window=$SESSION:w2:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo rev-parse HEAD
+87effe222dc8301463ee7e2259e69f205597a368
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo checkout -b fm/lbt2
+Switched to a new branch 'fm/lbt2'
+[exit 0]
+(worker follows the DoD: dev advanced locally, so rebase onto it; refs/heads/dev is spelled out because the lab also has a tag named dev)
+$ git -C ~/.treehouse/demo-986d03/1/demo rebase refs/heads/dev
+Rebasing (1/1)                                                                                Successfully rebased and updated refs/heads/fm/lbt2.
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo log --oneline -4
+fcf9c6f add OTHER.md
+989abe6 add FEATURE.md
+87effe2 dev: integration work
+63a201c init on main
+[exit 0]
+
+===== S8: fm-review-diff for a based local-only ship =====
+-- without config/spawn-base-primary-checkout (unchanged behavior: origin/dev, which still lacks lbt1 local landing) --
+$ fm fm-review-diff.sh lbt2 --stat
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+diff base: origin/dev
+ FEATURE.md | 1 +
+ OTHER.md   | 1 +
+ 2 files changed, 2 insertions(+)
+[exit 0]
+-- with config/spawn-base-primary-checkout (new: anchors on the local base dev the ship lands on; tag named dev present) --
+$ fm fm-review-diff.sh lbt2 --stat
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: dev
+ OTHER.md | 1 +
+ 1 file changed, 1 insertion(+)
+[exit 0]
+
+===== S7: adversarial teardown - lbt2's head reachable from main (the origin/HEAD default) but not from its recorded base dev must be refused =====
+$ git -C $LAB/projects/demo update-ref refs/heads/main fcf9c6f481a251edac5d8ad984c921fbbdd282d9
+[exit 0]
+$ git -C $LAB/projects/demo branch --contains fm/lbt2
++ fm/lbt2
+  main
+[exit 0]
+$ fm fm-teardown.sh lbt2
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: local-only worktree ~/.treehouse/demo-986d03/1/demo has work not yet merged into dev and not on any remote.
+commits not yet on dev:
+fcf9c6f add OTHER.md
+Merge the branch into local dev first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+[exit 1]
+$ test -f $LAB/state/lbt2.meta
+[exit 0]
+$ git -C $LAB/projects/demo update-ref refs/heads/main 63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse refs/heads/main
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+
+===== S7b: lbt2 reports done, lands on local dev, and then tears down cleanly =====
+$ accept_done lbt2
+[exit 0]
+$ grep ^local_done_head= $LAB/state/lbt2.meta
+local_done_head=fcf9c6f481a251edac5d8ad984c921fbbdd282d9
+[exit 0]
+$ fm fm-merge-local.sh lbt2
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lbt2 into local dev (989abe60b2ed620141d805916fda520eba4b1b35 -> fcf9c6f) in $LAB/projects/demo
+[exit 0]
+$ git -C $LAB/projects/demo log --oneline --decorate -4 refs/heads/dev
+fcf9c6f (HEAD -> dev, fm/lbt2) add OTHER.md
+989abe6 (fm/lbt1) add FEATURE.md
+87effe2 (origin/dev) dev: integration work
+63a201c (tag: dev, origin/main, origin/HEAD, main) init on main
+[exit 0]
+$ fm fm-teardown.sh lbt2
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbt2: 3606525 3607381
+teardown: force-killing leaked worktree process(es) for lbt2: 3606525
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbt2 complete (window $SESSION:w2:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbt2 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbt2 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ test -f $LAB/state/lbt2.meta
+[exit 1]
+
+===== S9: a base present on origin but with no local branch in the project is refused by name at landing and at teardown =====
+$ git -C $LAB/projects/demo show-ref --verify refs/heads/release
+fatal: 'refs/heads/release' - not a valid ref
+[exit 128]
+$ fm fm-brief.sh lbt3 demo --mode local-only --base-branch release
+scaffolded: $LAB/data/lbt3/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ fm fm-spawn.sh lbt3 $LAB/projects/demo sh -c 'echo lab-worker-lbt3-ready; exec sleep 7200' --mode local-only --yolo off --base-branch release --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbt3 harness=sh kind=ship mode=local-only yolo=off window=$SESSION:w3:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo log --oneline -2
+5a99405 release prep
+63a201c init on main
+[exit 0]
+$ accept_done lbt3
+[exit 0]
+$ fm fm-merge-local.sh lbt3
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: task lbt3 lands on its recorded base branch 'release', but $LAB/projects/demo has no local branch of that name; create or check it out there, then retry
+[exit 1]
+$ fm fm-teardown.sh lbt3
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: task lbt3 recorded base branch 'release', but $LAB/projects/demo has no local branch of that name to judge its work landed against.
+Restore that branch, or get the captain's explicit OK to discard, then --force.
+[exit 1]
+$ git -C $LAB/projects/demo rev-parse refs/heads/dev refs/heads/main
+fcf9c6f481a251edac5d8ad984c921fbbdd282d9
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ test -f $LAB/state/lbt3.meta
+[exit 0]
+
+===== S9b: following the refusal's advice (check out release in the project) lets the same accepted head land there =====
+$ git -C $LAB/projects/demo checkout -q release
+[exit 0]
+$ git -C $LAB/projects/demo branch --show-current
+release
+[exit 0]
+$ fm fm-merge-local.sh lbt3
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lbt3 into local release (5a99405bd75ed85b3453add89f9e6de46fcb8a0b -> 8269d10) in $LAB/projects/demo
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse refs/heads/release refs/heads/dev refs/heads/main
+8269d1081ba669aed216dd3408a5ee0c68083150
+fcf9c6f481a251edac5d8ad984c921fbbdd282d9
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ fm fm-teardown.sh lbt3
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbt3: 3613030 3614634
+teardown: force-killing leaked worktree process(es) for lbt3: 3613030
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbt3 complete (window $SESSION:w3:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbt3 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbt3 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ test -f $LAB/state/lbt3.meta
+[exit 1]
+
+===== S10: a scout spawned on base dev is promoted to a local-only ship that keeps dev as its landing branch =====
+$ fm fm-brief.sh lbs4 demo --scout --base-branch dev
+scaffolded: $LAB/data/lbs4/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ fm fm-spawn.sh lbs4 $LAB/projects/demo sh -c 'echo lab-scout-lbs4-ready; exec sleep 7200' --scout --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbs4 harness=sh kind=scout window=$SESSION:w4:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ grep -E ^(kind|mode|base_branch|branch)= $LAB/state/lbs4.meta
+kind=scout
+base_branch=dev
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo rev-parse HEAD
+87effe222dc8301463ee7e2259e69f205597a368
+[exit 0]
+$ fm fm-promote.sh lbs4 --mode local-only --yolo off
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+promoted lbs4 to ship mode=local-only yolo=off (teardown protection restored)
+wrote ship instructions for mode=local-only: $LAB/data/lbs4/ship-instructions.md
+next: FM_HOME=$LAB bin/fm-send.sh fm-lbs4 "$(cat $LAB/data/lbs4/ship-instructions.md)"
+[exit 0]
+$ grep -E ^(kind|mode|base_branch|branch|yolo)= $LAB/state/lbs4.meta
+base_branch=dev
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/lbs4
+[exit 0]
+$ grep -n -E base branch|local base|local `main`|fast-forward $LAB/data/lbs4/ship-instructions.md
+11:3. Return to a clean copy of the base branch `dev`, then create your branch: `git checkout -b fm/lbs4 --`.
+30:1. Never push to any remote and never open a PR. Work only on your `fm/lbs4` branch; firstmate handles the fast-forward of the local base branch `dev`.
+38:This task's base branch is `dev`, not the repository default: keep your branch a clean fast-forward onto it - if `dev` has advanced, rebase onto it so the eventual landing stays a fast-forward - and never rebase onto the default branch.
+40:The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.
+[exit 0]
+
+===== S10b: the promoted ship lands on local dev =====
+$ git -C  rebase refs/heads/dev
+fatal: invalid upstream 'refs/heads/dev'
+[exit 128]
+$ accept_done lbs4
+[exit 0]
+$ fm fm-merge-local.sh lbs4
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: branch fm/lbs4 differs from the recorded local done head; refusing
+[exit 1]
+$ git -C $LAB/projects/demo log --oneline --decorate -3 refs/heads/dev
+fcf9c6f (HEAD -> dev, fm/lbt2) add OTHER.md
+989abe6 (fm/lbt1) add FEATURE.md
+87effe2 (origin/dev) dev: integration work
+[exit 0]
+$ fm fm-teardown.sh lbs4
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbs4: 3620737 3621580
+teardown: force-killing leaked worktree process(es) for lbs4: 3620737
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbs4 complete (window $SESSION:w4:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbs4 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbs4 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ test -f $LAB/state/lbs4.meta
+[exit 1]
+
+(NOTE: the S10b attempt above is void - a driver bug left the worker-copy path variable empty, so the worker steps never ran in the lbs4 copy and lbs4 was torn down with no work. Redone below as lbs5 with path guards.)
+
+===== S10 (redo): scout lbs5 on base dev, promoted to local-only, lands on local dev =====
+$ fm fm-brief.sh lbs5 demo --scout --base-branch dev
+scaffolded: $LAB/data/lbs5/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ fm fm-spawn.sh lbs5 $LAB/projects/demo sh -c 'echo lab-scout-lbs5-ready; exec sleep 7200' --scout --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbs5 harness=sh kind=scout window=$SESSION:w5:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ fm fm-promote.sh lbs5 --mode local-only --yolo off
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+promoted lbs5 to ship mode=local-only yolo=off (teardown protection restored)
+wrote ship instructions for mode=local-only: $LAB/data/lbs5/ship-instructions.md
+next: FM_HOME=$LAB bin/fm-send.sh fm-lbs5 "$(cat $LAB/data/lbs5/ship-instructions.md)"
+[exit 0]
+$ grep -E ^(kind|mode|base_branch|branch)= $LAB/state/lbs5.meta
+base_branch=dev
+kind=ship
+mode=local-only
+branch=fm/lbs5
+[exit 0]
+$ grep -n -E base branch .dev|local base branch|local `main` $LAB/data/lbs5/ship-instructions.md
+11:3. Return to a clean copy of the base branch `dev`, then create your branch: `git checkout -b fm/lbs5 --`.
+30:1. Never push to any remote and never open a PR. Work only on your `fm/lbs5` branch; firstmate handles the fast-forward of the local base branch `dev`.
+40:The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo checkout -qb fm/lbs5
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo add CHANGELOG.md
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo commit -qm add CHANGELOG.md
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo rebase refs/heads/dev
+Rebasing (1/1)                                                                                Successfully rebased and updated refs/heads/fm/lbs5.
+[exit 0]
+$ accept_done lbs5
+[exit 0]
+$ grep ^local_done_head= $LAB/state/lbs5.meta
+local_done_head=b58037f38942678c931fabb18231a45543c89ee4
+[exit 0]
+$ git -C $LAB/projects/demo branch --show-current
+dev
+[exit 0]
+$ fm fm-merge-local.sh lbs5
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lbs5 into local dev (fcf9c6f481a251edac5d8ad984c921fbbdd282d9 -> b58037f) in $LAB/projects/demo
+[exit 0]
+$ git -C $LAB/projects/demo log --oneline --decorate -4 refs/heads/dev
+b58037f (HEAD -> dev, fm/lbs5) add CHANGELOG.md
+fcf9c6f (fm/lbt2) add OTHER.md
+989abe6 (fm/lbt1) add FEATURE.md
+87effe2 (origin/dev) dev: integration work
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse refs/heads/main
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ fm fm-teardown.sh lbs5
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbs5: 3628274 3629119
+teardown: force-killing leaked worktree process(es) for lbs5: 3628274
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbs5 complete (window $SESSION:w5:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbs5 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbs5 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ test ! -f $LAB/state/lbs5.meta
+[exit 0]
+
+===== S11: regression - a local-only task with NO base behaves exactly as before (starts from origin/main, lands on local main) =====
+$ fm fm-brief.sh lbt6 demo --mode local-only
+scaffolded: $LAB/data/lbt6/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ grep -n -E Base branch|local `main`|current default branch $LAB/data/lbt6/brief.md
+25:1. Never push to any remote and never open a PR. Work only on your `fm/lbt6` branch; firstmate handles the merge into local `main`.
+100:Keep your branch a clean fast-forward onto the current default branch - if `main` has advanced, rebase onto it so the eventual merge stays a fast-forward.
+102:The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the guarded fast-forward path.
+[exit 0]
+$ fm fm-spawn.sh lbt6 $LAB/projects/demo sh -c 'echo lab-worker-lbt6-ready; exec sleep 7200' --mode local-only --yolo off --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+spawned lbt6 harness=sh kind=ship mode=local-only yolo=off window=$SESSION:w6:p2 worktree=~/.treehouse/demo-986d03/1/demo
+[exit 0]
+$ grep -c ^base_branch= $LAB/state/lbt6.meta
+0
+[exit 1]
+$ git -C ~/.treehouse/demo-986d03/1/demo rev-parse HEAD
+63a201ceaf43009a1bb13619864103360ffc8617
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo checkout -qb fm/lbt6
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo add MAIN.md
+[exit 0]
+$ git -C ~/.treehouse/demo-986d03/1/demo commit -qm add MAIN.md
+[exit 0]
+$ accept_done lbt6
+[exit 0]
+$ git -C $LAB/projects/demo branch --show-current
+dev
+[exit 0]
+$ fm fm-merge-local.sh lbt6
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: $LAB/projects/demo is on 'dev', expected default branch 'main'; cannot merge safely
+[exit 1]
+$ fm fm-merge-local.sh lbt6
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+merged fm/lbt6 into local main (63a201ceaf43009a1bb13619864103360ffc8617 -> 436ac83) in $LAB/projects/demo
+[exit 0]
+$ git -C $LAB/projects/demo rev-parse refs/heads/main refs/heads/dev
+436ac83baa05beaae922c5fdb488217191c8032d
+b58037f38942678c931fabb18231a45543c89ee4
+[exit 0]
+$ fm fm-teardown.sh lbt6
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process(es) for lbt6: 3633466 3635571
+teardown: force-killing leaked worktree process(es) for lbt6: 3633466
+A new version of treehouse is available: v3.1.2 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbt6 complete (window $SESSION:w6:p2, worktree ~/.treehouse/demo-986d03/1/demo)
+Backlog: lbt6 just finished (this home keeps no markdown backlog at $LAB/data/backlog.md). Update $LAB/data/backlog.md - move lbt6 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ test ! -f $LAB/state/lbt6.meta
+[exit 0]
+
+===== S12: guards kept - a base on a forge, an invalid base name, and a base origin lacks are still refused =====
+$ fm fm-brief.sh lbg7 demo --mode direct-PR --forge gerrit --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=gerrit
+[exit 1]
+$ fm fm-brief.sh lbg8 demo --mode local-only --base-branch bad..name
+error: fm-brief.sh --base-branch: base branch 'bad..name' is not a valid git branch name
+[exit 1]
+$ fm fm-brief.sh lbg9 demo --mode local-only --base-branch -dev
+error: fm-brief.sh --base-branch: base branch '-dev' is not a valid git branch name
+[exit 1]
+$ ls $LAB/data
+lbs4
+lbs5
+lbt1
+lbt2
+lbt3
+lbt6
+projects.md
+[exit 0]
+$ fm fm-brief.sh lbt10 demo --mode local-only --base-branch nosuch
+scaffolded: $LAB/data/lbt10/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ fm fm-spawn.sh lbt10 $LAB/projects/demo sh -c 'exec sleep 60' --mode local-only --yolo off --base-branch nosuch --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home $LAB
+fatal: couldn't find remote ref refs/heads/nosuch
+error: could not fetch 'origin/nosuch' for pooled worktree '~/.treehouse/demo-986d03/1/demo'; refusing to launch from a potentially stale base
+[exit 1]
+$ test ! -e $LAB/state/lbt10.meta
+[exit 0]
+
+===== S0: contrast - the base commit (0adf422e) fm-brief refused local-only --base-branch outright =====
+$ FM_HOME=$LAB <base-commit>/bin/fm-brief.sh lbz11 demo --mode local-only --base-branch dev
+error: fm-brief.sh --base-branch: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base
+[exit 1]
+
+===== Final project state =====
+$ git -C $LAB/projects/demo log --oneline --decorate --all --graph
+* 436ac83 (HEAD -> main, fm/lbt6) add MAIN.md
+| * b58037f (fm/lbs5, dev) add CHANGELOG.md
+| * fcf9c6f (fm/lbt2) add OTHER.md
+| * 989abe6 (fm/lbt1) add FEATURE.md
+| * 87effe2 (origin/dev) dev: integration work
+|/  
+| * 8269d10 (release, fm/lbt3) add NOTES.md
+| * 5a99405 (origin/release) release prep
+|/  
+* 63a201c (tag: dev, origin/main, origin/HEAD) init on main
+[exit 0]
+$ git -C $LAB/projects/demo symbolic-ref --short refs/remotes/origin/HEAD
+origin/main
+[exit 0]
+$ git -C $LAB/remotes/demo.git log --oneline --decorate --all
+5a99405 (release) release prep
+87effe2 (dev) dev: integration work
+63a201c (HEAD -> main) init on main
+[exit 0]
