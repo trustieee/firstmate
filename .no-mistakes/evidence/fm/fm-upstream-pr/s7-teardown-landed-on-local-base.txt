@@ -1,0 +1,17 @@
+# task lbb-ship-a1: mode=local-only base_branch=dev; its done head a31938a is now on local dev (landed by fm-merge-local); origin never received it
+  origin/dev=2118f76  local dev=a31938a  main=4fe10f9
+$ HERDR_SESSION=$S FM_HOME=$LAB TREEHOUSE_ROOT=$WORK/pool bin/fm-teardown.sh lbb-ship-a1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+A new version of treehouse is available: v3.1.2 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown lbb-ship-a1 complete (window fm-lab-lbb-1752955-3374:w1:p2, worktree /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj)
+Backlog: lbb-ship-a1 just finished (this home keeps no markdown backlog at /tmp/fm-lab.ekPCCp/data/backlog.md). Update /tmp/fm-lab.ekPCCp/data/backlog.md - move lbb-ship-a1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+meta remains: no
+--- treehouse pool after teardown
+
+base  dev  (repository default)
+1     available    /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj  (detached)
+2     available    /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj  (detached)

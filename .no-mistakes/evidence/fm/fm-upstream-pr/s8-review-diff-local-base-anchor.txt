@@ -1,0 +1,32 @@
+# local dev (d204c7f) carries an earlier local landing that origin/dev (2118f76) never received; the ship is rebased onto local dev
+
+## without config/spawn-base-primary-checkout
+$ FM_HOME=$LAB bin/fm-review-diff.sh lbb-ship-a1 --stat
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+diff base: origin/dev
+ notes.txt         | 1 +
+ other-landing.txt | 1 +
+ 2 files changed, 2 insertions(+)
+exit=0
+
+## with config/spawn-base-primary-checkout (opt-in)
+$ FM_HOME=$LAB bin/fm-review-diff.sh lbb-ship-a1 --stat
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: dev
+ notes.txt | 1 +
+ 1 file changed, 1 insertion(+)
+exit=0
+
+## adversarial: a tag named 'dev' on the stale origin commit
+$ git -C $WORK/proj tag dev 2118f76; FM_HOME=$LAB bin/fm-review-diff.sh lbb-ship-a1 --stat
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+diff base: dev
+ notes.txt | 1 +
+ 1 file changed, 1 insertion(+)
+exit=0

@@ -1,0 +1,25 @@
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-refuse-18075 proj --mode direct-PR --forge gerrit --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=gerrit
+exit=1
+no brief written
+
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-refuse-6128 proj --mode no-mistakes --forge forgejo --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=forgejo
+exit=1
+no brief written
+
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-refuse-22127 proj --mode direct-PR --forge external --base-branch dev
+error: fm-brief.sh --base-branch: a base branch is not supported on forge=external
+exit=1
+no brief written
+
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-refuse-3833 proj --mode local-only --base-branch bad..name
+error: fm-brief.sh --base-branch: base branch 'bad..name' is not a valid git branch name
+exit=1
+no brief written
+
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-refuse-23336 proj --mode local-only --base-branch -dev
+error: fm-brief.sh --base-branch: base branch '-dev' is not a valid git branch name
+exit=1
+no brief written
+

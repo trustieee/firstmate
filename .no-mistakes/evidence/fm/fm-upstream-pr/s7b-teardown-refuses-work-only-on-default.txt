@@ -1,0 +1,10 @@
+# promoted ship lbb-scout-d4 (base_branch=dev) committed 4eb4ff1; someone fast-forwards it onto main, not dev
+  main=4eb4ff1  dev=a31938a  ship head on main: yes; on dev: no
+$ bin/fm-teardown.sh lbb-scout-d4
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+REFUSED: local-only worktree /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj has work not yet merged into dev and not on any remote.
+commits not yet on dev:
+4eb4ff1 Ship work for lbb-scout-d4
+Merge the branch into local dev first (bin/fm-merge-local.sh after the captain approves), or push to a fork/remote, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta remains: yes; worktree remains: yes

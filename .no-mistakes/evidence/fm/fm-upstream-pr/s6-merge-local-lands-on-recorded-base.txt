@@ -1,0 +1,16 @@
+# ship fm/lbb-ship-a1 local_done_head=a31938a; a tag named 'dev' shadows the branch at the stale 2118f76
+## 1. project checkout on main (the default branch), task records base_branch=dev
+  main=4fe10f9 dev=d204c7f tag dev=2118f76 origin/HEAD->origin/dev checkout=main dirty=[]
+$ FM_HOME=$LAB bin/fm-merge-local.sh lbb-ship-a1
+error: /tmp/fm-lbbw.ZxTBCv/proj is on 'main', but task lbb-ship-a1 lands on its recorded base branch 'dev'; check out dev in /tmp/fm-lbbw.ZxTBCv/proj before retrying, because the base named at intake is the landing branch and is not re-pointed here
+exit=1
+  main=4fe10f9 dev=d204c7f tag dev=2118f76 origin/HEAD->origin/dev checkout=main dirty=[]
+
+## 2. project checkout on dev
+warning: refname 'dev' is ambiguous.   <- from the test driver's own `git checkout dev` (tag shadow fixture), not the product
+  main=4fe10f9 dev=d204c7f tag dev=2118f76 origin/HEAD->origin/dev checkout=dev dirty=[]
+$ FM_HOME=$LAB bin/fm-merge-local.sh lbb-ship-a1
+merged fm/lbb-ship-a1 into local dev (d204c7fcb074a7f08dc21f20dda337cd504f3972 -> a31938a) in /tmp/fm-lbbw.ZxTBCv/proj
+exit=0
+  main=4fe10f9 dev=a31938a tag dev=2118f76 origin/HEAD->origin/dev checkout=dev dirty=[]
+  notes.txt in checkout: lab note on dev; other-landing.txt kept: yes

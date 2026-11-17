@@ -1,0 +1,23 @@
+# origin carries 'release'; the project clone has no local release branch
+  local branches: heads/dev fm/lbb-scout-d4 local-only-base main 
+$ bin/fm-spawn.sh lbb-ship-f6 $WORK/proj "sh -c 'echo up; exec sleep 1800'" --mode local-only --yolo off --base-branch release --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj. Run 'treehouse return /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj' to release it.
+spawned lbb-ship-f6 harness=sh kind=ship mode=local-only yolo=off window=fm-lab-lbb-1752955-3374:w1:p5 worktree=/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj
+exit=0
+copy HEAD=2118f76 origin/release=2118f76; meta base_branch=release
+done accepted exit=0; local_done_head=699f1484eb8739869d598f4ca952ef03b710bad6
+
+$ bin/fm-merge-local.sh lbb-ship-f6
+error: task lbb-ship-f6 lands on its recorded base branch 'release', but /tmp/fm-lbbw.ZxTBCv/proj has no local branch of that name; create or check it out there, then retry
+exit=1
+  local branches after: heads/dev=a31938a fm/lbb-scout-d4=4eb4ff1 fm/lbb-ship-f6=699f148 local-only-base=2118f76 main=4fe10f9 
+
+$ bin/fm-teardown.sh lbb-ship-f6
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+REFUSED: task lbb-ship-f6 recorded base branch 'release', but /tmp/fm-lbbw.ZxTBCv/proj has no local branch of that name to judge its work landed against.
+Restore that branch, or get the captain's explicit OK to discard, then --force.
+exit=1
+meta remains: yes; worktree remains: yes

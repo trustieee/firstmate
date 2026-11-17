@@ -1,0 +1,23 @@
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-scout-d4 proj --scout --base-branch dev
+scaffolded: /tmp/fm-lab.ekPCCp/data/lbb-scout-d4/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ bin/fm-spawn.sh lbb-scout-d4 $WORK/proj "sh -c 'echo scout-up; exec sleep 1800'" --scout --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj. Run 'treehouse return /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj' to release it.
+spawned lbb-scout-d4 harness=sh kind=scout window=fm-lab-lbb-1752955-3374:w1:p4 worktree=/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj
+exit=0
+scout meta: kind=scout base_branch=dev 
+
+$ FM_HOME=$LAB bin/fm-promote.sh lbb-scout-d4 --mode local-only --yolo off
+promoted lbb-scout-d4 to ship mode=local-only yolo=off (teardown protection restored)
+wrote ship instructions for mode=local-only: /tmp/fm-lab.ekPCCp/data/lbb-scout-d4/ship-instructions.md
+next: FM_HOME=/tmp/fm-lab.ekPCCp bin/fm-send.sh fm-lbb-scout-d4 "$(cat /tmp/fm-lab.ekPCCp/data/lbb-scout-d4/ship-instructions.md)"
+exit=0
+promoted meta: base_branch=dev kind=ship mode=local-only branch=fm/lbb-scout-d4 
+--- data/lbb-scout-d4/ship-instructions.md: landing lines
+11:3. Return to a clean copy of the base branch `dev`, then create your branch: `git checkout -b fm/lbb-scout-d4 --`.
+30:1. Never push to any remote and never open a PR. Work only on your `fm/lbb-scout-d4` branch; firstmate handles the fast-forward of the local base branch `dev`.
+38:This task's base branch is `dev`, not the repository default: keep your branch a clean fast-forward onto it - if `dev` has advanced, rebase onto it so the eventual landing stays a fast-forward - and never rebase onto the default branch.
+40:The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.

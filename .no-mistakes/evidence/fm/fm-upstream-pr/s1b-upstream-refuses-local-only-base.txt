@@ -1,0 +1,3 @@
+$ (upstream 427056c4) FM_HOME=$LAB0 bin/fm-brief.sh lbb-ship-a1 proj --mode local-only --base-branch dev
+error: fm-brief.sh --base-branch: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base
+exit=1

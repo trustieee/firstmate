@@ -1,0 +1,29 @@
+# task lbb-ship-e5: local-only, NO --base-branch (origin/HEAD currently hand-pointed at origin/dev)
+$ bin/fm-spawn.sh lbb-ship-e5 $WORK/proj "sh -c 'echo up; exec sleep 1800'" --mode local-only --yolo off --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/3/proj. Run 'treehouse return /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/3/proj' to release it.
+spawned lbb-ship-e5 harness=sh kind=ship mode=local-only yolo=off window=fm-lab-lbb-1752955-3374:w1:p6 worktree=/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/3/proj
+exit=0
+copy HEAD=e752726 origin/main=e752726; base_branch recorded: 0; origin/HEAD now -> origin/main (re-resolved from the remote, as upstream does with no base)
+done accepted exit=0
+
+## project checkout on dev
+$ bin/fm-merge-local.sh lbb-ship-e5
+error: /tmp/fm-lbbw.ZxTBCv/proj is on 'dev', expected default branch 'main'; cannot merge safely
+exit=1
+## project checkout on main
+$ bin/fm-merge-local.sh lbb-ship-e5
+merged fm/lbb-ship-e5 into local main (4fe10f9f8472cdac06e20baf0e73c67677be1b87 -> bc7e9be) in /tmp/fm-lbbw.ZxTBCv/proj
+exit=0
+  main=bc7e9be dev=a31938a (dev unchanged from a31938a)
+
+$ bin/fm-teardown.sh lbb-ship-e5
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+
+🌳 Worktree returned to pool.
+teardown lbb-ship-e5 complete (window fm-lab-lbb-1752955-3374:w1:p6, worktree /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/3/proj)
+Backlog: lbb-ship-e5 just finished (this home keeps no markdown backlog at /tmp/fm-lab.ekPCCp/data/backlog.md). Update /tmp/fm-lab.ekPCCp/data/backlog.md - move lbb-ship-e5 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+meta remains: no

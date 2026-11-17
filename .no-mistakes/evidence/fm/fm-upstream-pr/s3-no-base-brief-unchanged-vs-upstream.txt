@@ -1,0 +1,8 @@
+mode=local-only no --base-branch: brief IDENTICAL to upstream 427056c4 (102 lines)
+mode=no-mistakes no --base-branch: brief IDENTICAL to upstream 427056c4 (137 lines)
+mode=direct-PR no --base-branch: brief IDENTICAL to upstream 427056c4 (105 lines)
+
+Landing lines of the no-base local-only brief (unchanged):
+25:1. Never push to any remote and never open a PR. Work only on your `fm/lbb-nobase-local-only` branch; firstmate handles the merge into local `main`.
+100:Keep your branch a clean fast-forward onto the current default branch - if `main` has advanced, rebase onto it so the eventual merge stays a fast-forward.
+102:The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the guarded fast-forward path.

@@ -1,0 +1,6 @@
+# fm-crew-state reads the raw 'sh' worker pane as 'harness state unavailable', so the status-log done is accepted through the same
+# bin/fm-dod-lib.sh fm_dod_accept_ship_done call fm-crew-state.sh/fm-inactive-reconcile.sh make, against the lab's real records
+status line: done [at=1794926524]: ready in branch fm/lbb-ship-a1
+accept exit=0
+recorded: local_done_head=a31938a02cb09377f72a29c6e00e480d60bdbf72
+ship head: a31938a02cb09377f72a29c6e00e480d60bdbf72

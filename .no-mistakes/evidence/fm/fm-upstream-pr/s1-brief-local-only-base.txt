@@ -1,0 +1,17 @@
+$ FM_HOME=$LAB bin/fm-brief.sh lbb-ship-a1 proj --mode local-only --base-branch dev
+scaffolded: /tmp/fm-lab.ekPCCp/data/lbb-ship-a1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+--- rendered brief: Setup base line, rule 1, and Definition of done
+# Setup
+You are in a disposable git worktree of proj, at a detached HEAD on a clean copy of its base branch.
+Base branch: dev
+1. Never push to any remote and never open a PR. Work only on your `fm/lbb-ship-a1` branch; firstmate handles the fast-forward of the local base branch `dev`.
+# Definition of done
+Delivery contract: mode=local-only
+Ship branch: fm/lbb-ship-a1
+This task ships **local-only**: no remote, no PR, no pipeline.
+The task is complete only when committed on your branch `fm/lbb-ship-a1`. Do NOT push, do NOT open a PR, do NOT merge.
+A `done:` is accepted when the named head is on this project's shared local branch, not only on a detached copy; the check tests that head, not merely that a branch moved.
+This task's base branch is `dev`, not the repository default: keep your branch a clean fast-forward onto it - if `dev` has advanced, rebase onto it so the eventual landing stays a fast-forward - and never rebase onto the default branch.
+When it is implemented and committed, append `done [at=<epoch>]: ready in branch fm/lbb-ship-a1` to the status file and stop.
+The configured merge authority approves the ready branch, then firstmate fast-forwards the local base branch `dev` to it through the guarded landing path; the clone's default-branch record plays no part.

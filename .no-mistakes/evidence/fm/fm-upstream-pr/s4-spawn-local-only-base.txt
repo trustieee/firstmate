@@ -1,0 +1,40 @@
+# before spawn
+project origin/HEAD -> refs/remotes/origin/dev  (hand-pointed; origin's real HEAD is main)
+origin/main = e752726   origin/dev = 2118f76
+
+$ HERDR_SESSION=fm-lab-lbb-1752955-3374 FM_HOME=$LAB TREEHOUSE_ROOT=$WORK/pool bin/fm-spawn.sh lbb-ship-a1 $WORK/proj "sh -c 'echo lbb-worker-up; exec sleep 1800'" --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+A new version of treehouse is available: v3.1.2 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj. Run 'treehouse return /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj' to release it.
+spawned lbb-ship-a1 harness=sh kind=ship mode=local-only yolo=off window=fm-lab-lbb-1752955-3374:w1:p2 worktree=/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj
+exit=0
+# after spawn
+--- state/lbb-ship-a1.meta (selected keys)
+window=fm-lab-lbb-1752955-3374:w1:p2
+worktree=/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj
+project=/tmp/fm-lbbw.ZxTBCv/proj
+kind=ship
+mode=local-only
+branch=fm/lbb-ship-a1
+base_branch=dev
+backend=herdr
+herdr_session=fm-lab-lbb-1752955-3374
+--- worktree copy
+copy HEAD        = 2118f76
+origin/dev       = 2118f76
+origin/main      = e752726
+copy has dev.txt: yes; copy has main-only.txt: no
+--- origin/HEAD record
+project origin/HEAD -> refs/remotes/origin/dev
+--- worker pane (real herdr lab)
+--- worker pane text (real herdr lab session fm-lab-lbb-1752955-3374, pane w1:p2)
+user@host:/tmp/fm-lbbw.ZxTBCv/proj$ cd -- '/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj'
+user@host:/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj$ export GOTMPDIR=/tmp/fm-lbb-ship-a1/gotmp
+user@host:/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj$ export COMPACT_ADVISER_DISABLE=1
+user@host:/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj$ export FM_TASK_ID=lbb-ship-a1
+user@host:/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/1/proj$ . '/tmp/fm-lbb-ship-a1+768601c7e92576cc036226b1b
+c4c296e555678d0845d304d5b2bec3685d2ae6e/launch.s1794926469.1759657.16409.sh'
+lbb-worker-up

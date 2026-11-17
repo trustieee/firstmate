@@ -1,0 +1,18 @@
+# project has a LOCAL branch 'local-only-base' that origin does not carry
+$ bin/fm-spawn.sh lbb-ship-gone $WORK/proj "sh -c 'echo x; exec sleep 60'" --mode local-only --yolo off --base-branch local-only-base --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj. Run 'treehouse return /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj' to release it.
+fatal: couldn't find remote ref refs/heads/local-only-base
+error: could not fetch 'origin/local-only-base' for pooled worktree '/tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj'; refusing to launch from a potentially stale base
+warning: the worktree /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj stays leased to lbb-ship-gone after the failed spawn; once inspected, run 'treehouse return --force /tmp/fm-lbbw.ZxTBCv/pool/.treehouse/proj-a667d5/2/proj' from /tmp/fm-lbbw.ZxTBCv/proj
+exit=1
+meta published: no
+
+# brief records Base branch: local-only-base, but the spawn passes --base-branch dev
+$ bin/fm-spawn.sh lbb-ship-gone ... --mode local-only --yolo off --base-branch dev --backend herdr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekPCCp
+error: /tmp/fm-lab.ekPCCp/data/lbb-ship-gone/brief.md must record Base branch: dev and no other Base branch line to spawn with --base-branch dev; scaffold it with bin/fm-brief.sh --base-branch dev
+exit=1
+meta published: no
